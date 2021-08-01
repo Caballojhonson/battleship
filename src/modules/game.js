@@ -1,4 +1,6 @@
 function Ship(type, x, y, axis) {
+	const length = getShipLength(type);
+
 	function getShipLength(type) {
 		if (type === 'carrier') return 5;
 		if (type === 'battleship') return 4;
@@ -11,23 +13,37 @@ function Ship(type, x, y, axis) {
 		let coords = [];
 
 		if (axis === 'x') {
-			for (let i = Math.floor(x - length / 2); i < length; i++) {
-				coords.push([i, y]);
+			if (x + length > 10) {
+				for (let i = 10; i > 10 - length; i--) {
+					coords.push([i, y]);
+				}
+			} else {
+				for (let i = x; i < x + length; i++) {
+					coords.push([i, y]);
+				}
 			}
 		}
 
 		if (axis === 'y') {
-			for (let i = Math.floor(y - length / 2); i < length; i++) {
-				coords.push([x, i]);
+			if (y + length > 10) {
+				for (let i = 10; i > 10 - length; i--) {
+					coords.push([x, i]);
+				}
+			} else {
+				for (let i = y; i < y + length; i++) {
+					coords.push([x, i]);
+				}
 			}
 		}
+
+		return coords;
 	}
 
 	return {
 		type: type,
 		axis: axis,
 		length: length,
-		coords: [],
+		coords: getCoords(),
 		hitAt: [],
 		sunk: false,
 		hit(n) {
@@ -48,6 +64,7 @@ function Gameboard() {
 			y: y,
 			hit: false,
 			hasShip: false,
+			missed: false,
 		};
 	}
 
@@ -65,13 +82,88 @@ function Gameboard() {
 		return grid;
 	}
 
+	function placeShip(type, x, y, axis) {
+		const newShip = new Ship(type, x, y, axis);
+		this.ships.push(newShip);
+
+		newShip.coords.forEach((coord) => {
+			for (let i = 0; i < this.grid.length; i++) {
+				const cell = this.grid[i];
+				if (coord[0] === cell.x && coord[1] === cell.y) {
+					cell.hasShip = true;
+				}
+			}
+		});
+	}
+
+	function recieveAttack(x, y) {
+		let missed = false;
+
+		this.ships.forEach((ship) => {
+			for (let i = 0; i < ship.coords.length; i++) {
+				const coordPair = ship.coords[i];
+				if (coordPair[0] === x && coordPair[1] === y) {
+					ship.hit(i);
+					return;
+				} else {
+					missed = true;
+				}
+			}
+		});
+
+		this.grid.forEach((cell) => {
+			if (cell.x === x && cell.y === y) {
+				cell.hit = true;
+				if (missed) {
+					cell.missed = true;
+				}
+			}
+		});
+	}
+
+	function gameoverEval() {
+		let sunkenShips = [];
+
+		this.ships.forEach((ship) => {
+			sunkenShips.push(ship.sunk)
+		})
+		return sunkenShips.every(val => val)
+	}
+
 	return {
 		grid: generateGrid(),
+		ships: [],
+		placeShip,
+		recieveAttack,
+		gameoverEval
 	};
 }
 
-let testBoard = new Gameboard();
+function Player(name) {
 
-module.exports = { testBoard, Ship, Gameboard };
+	function play(board) {
+		let randX = [Math.round(Math.random() * 9) + 1];
+		let randY = [Math.round(Math.random() * 9) + 1];
 
-// Ship types: Carrier(5), Battleship(4), Cruiser(3), Destroyer(2) x2, Submarine(1), x2.
+		board.grid.forEach((cell) => {
+			if(cell.x === randX && cell.y === randY) {
+
+				if (cell.hit) {
+					play(board);
+					return;
+				} else {
+					board.recieveAttack(randX, randY);
+				}
+
+			}
+		})
+	}
+
+	return {
+		name: name,
+		isTurn: false,
+		isAI: false
+	}
+}
+
+module.exports = { Ship, Gameboard, Player };
