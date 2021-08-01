@@ -34,6 +34,6 @@ test('Ship object does not break when repeating hits', () => {
     expect(testShip.hitAt).toStrictEqual([1, 2])
 })
 
-test('Gameboard has a grid with 100 cells', () => {
-	expect(game.testBoard.grid).toHaveLength(100);
-});
+test('Template', () => {
+    expect().to()
+})
