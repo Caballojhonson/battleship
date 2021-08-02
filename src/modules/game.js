@@ -89,11 +89,67 @@ function Gameboard() {
 		newShip.coords.forEach((coord) => {
 			for (let i = 0; i < this.grid.length; i++) {
 				const cell = this.grid[i];
-				if (coord[0] === cell.x && coord[1] === cell.y) {
-					cell.hasShip = true;
+
+				if (!cell.hasShip) {
+					if (coord[0] === cell.x && coord[1] === cell.y) {
+						cell.hasShip = true;
+					}
 				}
 			}
 		});
+	}
+
+	function randomize() {
+		const gameboard = this;
+		const shipTypes = [
+			'carrier',
+			'battleship',
+			'cruiser',
+			'destroyer',
+			'destroyer',
+			'submarine',
+			'submarine',
+		];
+		const randX = () => Math.round(Math.random() * 9) + 1;
+		const randY = () => Math.round(Math.random() * 9) + 1;
+		const randAxis = () => {
+			if (Math.random() > 0.5) return 'x';
+			else return 'y';
+		};
+
+		function occupiedCells() {
+			return gameboard.grid.filter((cell) => cell.hasShip);
+		}
+
+		function coordsAreClear(ship) {
+			let results = [];
+
+			ship.coords.forEach((pair) => {
+				occupiedCells().forEach((cell) => {
+					if (pair[0] === cell.x && pair[1] === cell.y) {
+						results.push(false);
+					}
+				});
+			});
+			return results.every((val) => val);
+		}
+
+		function validateShip(type) {
+			const newShip = new Ship(type, randX(), randY(), randAxis());
+
+			if (coordsAreClear(newShip)) return newShip;
+			else validateShip(type);
+		}
+
+		function placeShips() {
+			shipTypes.forEach((ship) => {
+				const newShip = validateShip(ship);
+
+				gameboard.ships.push(newShip);
+			});
+		}
+
+		placeShips();
 	}
 
 	function recieveAttack(x, y) {
@@ -125,45 +181,57 @@ function Gameboard() {
 		let sunkenShips = [];
 
 		this.ships.forEach((ship) => {
-			sunkenShips.push(ship.sunk)
-		})
-		return sunkenShips.every(val => val)
+			sunkenShips.push(ship.sunk);
+		});
+		return sunkenShips.every((val) => val);
 	}
 
 	return {
 		grid: generateGrid(),
 		ships: [],
 		placeShip,
+		randomize,
 		recieveAttack,
-		gameoverEval
+		gameoverEval,
 	};
 }
 
 function Player(name) {
-
 	function play(board) {
-		let randX = [Math.round(Math.random() * 9) + 1];
-		let randY = [Math.round(Math.random() * 9) + 1];
+		let randX = Math.round(Math.random() * 9) + 1;
+		let randY = Math.round(Math.random() * 9) + 1;
 
 		board.grid.forEach((cell) => {
-			if(cell.x === randX && cell.y === randY) {
-
+			if (cell.x === randX && cell.y === randY) {
 				if (cell.hit) {
 					play(board);
 					return;
 				} else {
 					board.recieveAttack(randX, randY);
 				}
-
 			}
-		})
+		});
 	}
 
 	return {
 		name: name,
 		isTurn: false,
-		isAI: false
-	}
+		isAI: false,
+		play,
+	};
 }
 
-module.exports = { Ship, Gameboard, Player };
+const run = (() => {
+	const playerBoard = new Gameboard();
+	const AIBoard = new Gameboard();
+
+	playerBoard.randomize();
+	AIBoard.randomize();
+
+	console.log(playerBoard);
+	console.log(AIBoard);
+
+	return { playerBoard, AIBoard };
+})();
+
+module.exports = { Ship, Gameboard, Player, run };

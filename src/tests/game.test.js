@@ -100,3 +100,10 @@ test('Board does not declare GameOver randomly', () => {
     
     expect(gameboard.gameoverEval()).toBe(false);
 })
+
+test ('Ships are randomly generated', () => {
+    const gameboard = new game.Gameboard();
+    gameboard.randomize();
+
+    expect(gameboard.ships).toHaveLength(7);
+});
