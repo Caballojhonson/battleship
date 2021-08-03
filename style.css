@@ -1,0 +1,25 @@
+#main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, auto);
+    grid-template-rows: repeat(10, auto);
+    height: 40vh;
+    width: 40vh;
+    margin: 5vh;
+    border: 0.5px solid black;
+}
+.cell {
+    border: 0.5px solid black;
+}
+.has-ship {
+    background-color: grey;
+}
+.missed {
+    background-color: yellow;
+}

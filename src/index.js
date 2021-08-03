@@ -1,4 +1,5 @@
-const { run } = require("./modules/game");
+import '../style.css'
+import { run } from './modules/game'
 
 
 

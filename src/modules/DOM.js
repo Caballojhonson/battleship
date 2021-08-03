@@ -1,16 +1,35 @@
-const { run } = require("./game")
 
-function renderBoards() {
-    const playerBoard = document.getElementById('player-board')
-    const AIBoard = document.getElementById('AI-board')
+const playerBoard = document.getElementById('player-board')
+const AIBoard = document.getElementById('AI-board')
 
-    run.playerBoard.grid.forEach((cell) => {
-        const square = document.createElement('div');
+const elems = [playerBoard, AIBoard];
 
-        square.setAttribute('data-x', cell.x);
-        square.setAttribute('data-y', cell.y);
-        square.classList.add('cell');
+function renderBoards(b1, b2) {
+    const boards = [b1, b2];
 
-        playerBoard.appendChild(square)
+    boards.forEach((board, i) => {
+        board.grid.forEach((cell) => {
+            const square = document.createElement('div');
+    
+            square.setAttribute('data-x', cell.x);
+            square.setAttribute('data-y', cell.y);
+            square.classList.add('cell');
+    
+            elems[i].appendChild(square);
+        })
+    })
+    renderShips(boards)
+}
+
+function renderShips(boards) {
+
+    boards.forEach((board, i) => {
+        board.grid.forEach((cell, j) => {
+            if (cell.hasShip) {
+                elems[i].children[j].classList.add('has-ship')
+            }
+        })
     })
 }
+
+module.exports = {renderBoards}
