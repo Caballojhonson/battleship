@@ -1,5 +1,7 @@
 import '../style.css'
-import { run } from './modules/game'
+import { setup } from './modules/game'
 
 
 
+
+setup();

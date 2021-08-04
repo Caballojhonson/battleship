@@ -16,10 +16,14 @@
 }
 .cell {
     border: 0.5px solid black;
+    cursor: pointer;
 }
 .has-ship {
     background-color: grey;
 }
 .missed {
     background-color: yellow;
+}
+.hit {
+    background-color: red;
 }

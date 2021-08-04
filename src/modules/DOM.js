@@ -1,35 +1,66 @@
+const DOM = (() => {
+	const DOMplayerBoard = document.getElementById('player-board');
+	const DOMAIBoard = document.getElementById('AI-board');
+	const DOMBoards = [DOMplayerBoard, DOMAIBoard];
 
-const playerBoard = document.getElementById('player-board')
-const AIBoard = document.getElementById('AI-board')
+	const startup = (playerBoard, AIboard) => {
+		renderBoards();
+		renderShips(playerBoard);
+		addListeners(AIboard);
 
-const elems = [playerBoard, AIBoard];
+		function renderBoards() {
+			const boards = [playerBoard, AIboard];
 
-function renderBoards(b1, b2) {
-    const boards = [b1, b2];
+			boards.forEach((board, i) => {
+				board.grid.forEach((cell) => {
+					const square = document.createElement('div');
 
-    boards.forEach((board, i) => {
-        board.grid.forEach((cell) => {
-            const square = document.createElement('div');
-    
-            square.setAttribute('data-x', cell.x);
-            square.setAttribute('data-y', cell.y);
-            square.classList.add('cell');
-    
-            elems[i].appendChild(square);
-        })
-    })
-    renderShips(boards)
-}
+					square.setAttribute('data-x', cell.x);
+					square.setAttribute('data-y', cell.y);
+					square.classList.add('cell');
 
-function renderShips(boards) {
+					DOMBoards[i].appendChild(square);
+				});
+			});
+		}
 
-    boards.forEach((board, i) => {
-        board.grid.forEach((cell, j) => {
-            if (cell.hasShip) {
-                elems[i].children[j].classList.add('has-ship')
-            }
-        })
-    })
-}
+		function renderShips(board) {
+			board.grid.forEach((cell, i) => {
+				if (cell.hasShip) {
+					DOMplayerBoard.children[i].classList.add('has-ship');
+				}
+			});
+		}
 
-module.exports = {renderBoards}
+		function addListeners(board) {
+			for (let i = 0; i < DOMAIBoard.children.length; i++) {
+				const child = DOMAIBoard.children[i];
+
+				child.addEventListener('click', () => {
+					board.recieveAttack(child.dataset.x, child.dataset.y);
+					renderAttacks(playerBoard, AIboard);
+				});
+			}
+		}
+	};
+
+	const renderAttacks = (player, AI) => {
+		const boards = [player, AI];
+		console.log(player);
+		renderMissed();
+
+		function renderMissed() {
+			boards.forEach((board, i) => {
+				board.grid.forEach((cell, j) => {
+					if (cell.missed) {
+						DOMBoards[i].children[j].classList.add('missed');
+					}
+				});
+			});
+		}
+	};
+
+	return { startup };
+})();
+
+module.exports = { DOM };
