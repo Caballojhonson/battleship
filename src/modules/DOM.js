@@ -1,16 +1,18 @@
+import { playerBoard, AIBoard } from "./game";
+
 const DOM = (() => {
 	const DOMplayerBoard = document.getElementById('player-board');
 	const DOMAIBoard = document.getElementById('AI-board');
 	const DOMBoards = [DOMplayerBoard, DOMAIBoard];
 
-	const startup = (playerBoard, AIboard) => {
+	const startup = () => {
+		console.log(AIBoard);
 		renderBoards();
 		renderShips(playerBoard);
-		addListeners(AIboard);
+		addListeners(AIBoard);
 
 		function renderBoards() {
-			const boards = [playerBoard, AIboard];
-
+			const boards = [playerBoard, AIBoard];
 			boards.forEach((board, i) => {
 				board.grid.forEach((cell) => {
 					const square = document.createElement('div');
@@ -38,16 +40,17 @@ const DOM = (() => {
 
 				child.addEventListener('click', () => {
 					board.recieveAttack(child.dataset.x, child.dataset.y);
-					renderAttacks(playerBoard, AIboard);
+					renderAttacks(i, child);
+					//console.log(board.gameoverEval());
 				});
 			}
 		}
 	};
 
-	const renderAttacks = (player, AI) => {
-		const boards = [player, AI];
-		console.log(player);
+	const renderAttacks = (cellIndex, DOMcell) => {
+		const boards = [playerBoard, AIBoard];
 		renderMissed();
+		renderHits();
 
 		function renderMissed() {
 			boards.forEach((board, i) => {
@@ -58,9 +61,16 @@ const DOM = (() => {
 				});
 			});
 		}
+
+		function renderHits() {
+			const boardCell = AIBoard.grid[cellIndex]
+			if(boardCell.hasShip && boardCell.hit) {
+				DOMcell.classList.add('hit')
+			}
+		}
 	};
 
 	return { startup };
 })();
 
-module.exports = { DOM };
+export {DOM}

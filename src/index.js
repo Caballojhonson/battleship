@@ -1,7 +1,7 @@
 import '../style.css'
-import { setup } from './modules/game'
+import { runGame } from './modules/game'
+import { DOM } from './modules/DOM'
 
 
 
-
-setup();
+runGame()

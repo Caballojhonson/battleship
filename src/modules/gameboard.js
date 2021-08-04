@@ -1,4 +1,4 @@
-const Ship = require("./ship");
+const Ship = require('./ship');
 
 function Gameboard() {
 	function Grid(id, x, y) {
@@ -79,8 +79,6 @@ function Gameboard() {
 			else return 'y';
 		};
 
-		
-
 		const sortCells = (board) => {
 			legalCells = [];
 
@@ -134,8 +132,6 @@ function Gameboard() {
 
 		const tryShip = (type) => {
 			const randomLegalCell = legalCells[randIndex(legalCells.length)];
-			console.log(randomLegalCell);
-			console.log(legalCells.length);
 			const x = randomLegalCell.x;
 			const y = randomLegalCell.y;
 			const axis = randAxis();
@@ -160,37 +156,24 @@ function Gameboard() {
 	}
 
 	function recieveAttack(x, y) {
-		let missed = false;
+		let matchingCell = findCell(this, parseInt(x), parseInt(y));
+
+		matchingCell.hit = true;
+		if (!matchingCell.hasShip) matchingCell.missed = true;
 
 		this.ships.forEach((ship) => {
 			for (let i = 0; i < ship.coords.length; i++) {
 				const coordPair = ship.coords[i];
-				if (coordPair[0] === x && coordPair[1] === y) {
-					ship.hit(i);
-					return;
-				} else {
-					missed = true;
-				}
-			}
-		});
 
-		this.grid.forEach((cell) => {
-			if (cell.x === x && cell.y === y) {
-				cell.hit = true;
-				if (missed) {
-					cell.missed = true;
+				if (coordPair[0] == x && coordPair[1] == y) {
+					ship.hit(i);
 				}
 			}
 		});
 	}
 
 	function gameoverEval() {
-		let sunkenShips = [];
-
-		this.ships.forEach((ship) => {
-			sunkenShips.push(ship.sunk);
-		});
-		return sunkenShips.every((val) => val);
+		return this.ships.every((ship) => ship.sunk);
 	}
 
 	function findCell(board, x, y) {
