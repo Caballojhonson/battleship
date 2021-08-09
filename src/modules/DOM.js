@@ -1,4 +1,5 @@
-import { playerBoard, AIBoard } from "./game";
+import { playerBoard, AIBoard, human, AI } from './game';
+import flame from '../icons/flame.png';
 
 const DOM = (() => {
 	const DOMplayerBoard = document.getElementById('player-board');
@@ -39,38 +40,76 @@ const DOM = (() => {
 				const child = DOMAIBoard.children[i];
 
 				child.addEventListener('click', () => {
+					if(human.isTurn) {
 					board.recieveAttack(child.dataset.x, child.dataset.y);
-					renderAttacks(i, child);
-					//console.log(board.gameoverEval());
+					if(board.gameoverEval()){congratulateWinner(human)}
+					renderAttacks(AIBoard, i, child);
+					human.isTurn = false;
+					setTimeout(() => {
+						AI.play(playerBoard);
+						if(playerBoard.gameoverEval()){congratulateWinner(AI)}
+						bruteForceRender()
+						human.isTurn = true;
+				}, 200)
+					console.log(AI);
+					}
 				});
 			}
 		}
 	};
 
-	const renderAttacks = (cellIndex, DOMcell) => {
-		const boards = [playerBoard, AIBoard];
+	const bruteForceRender = () => {
+		playerBoard.grid.forEach((cell) => {
+			const DOMcell = DOMplayerBoard.children[cell.id - 1]
+			if (cell.missed) {
+				DOMcell.classList.add('missed');
+			}
+			if (cell.hasShip && cell.hit) {
+				if(DOMcell.children.length < 1) {
+				DOMcell.appendChild(makeFlame());
+				}
+				DOMcell.classList.add('has-ship');
+			}
+		})
+	}
+
+	const renderAttacks = (board, cellIndex, DOMcell) => {
+		const boardCell = board.grid[cellIndex];
+
 		renderMissed();
 		renderHits();
 
 		function renderMissed() {
-			boards.forEach((board, i) => {
-				board.grid.forEach((cell, j) => {
-					if (cell.missed) {
-						DOMBoards[i].children[j].classList.add('missed');
-					}
-				});
-			});
+			if (boardCell.missed) {
+				DOMcell.classList.add('missed');
+			}
 		}
 
 		function renderHits() {
-			const boardCell = AIBoard.grid[cellIndex]
-			if(boardCell.hasShip && boardCell.hit) {
-				DOMcell.classList.add('hit')
+			if (boardCell.hasShip && boardCell.hit) {
+				if(DOMcell.children.length < 1) {
+				DOMcell.appendChild(makeFlame());
+				}
+				DOMcell.classList.add('has-ship');
 			}
 		}
+		
 	};
 
-	return { startup };
+	function makeFlame() {
+		const flameIcon = new Image();
+		flameIcon.src = flame;
+		flameIcon.classList.add('hit');
+		return flameIcon;
+	}
+
+	function congratulateWinner(player) {
+		let winScreen = document.getElementById('winner-screen');
+		winScreen.textContent = `${player.name} Wins!`;
+		winScreen.style.display = 'flex'
+	}
+
+	return { startup, renderAttacks };
 })();
 
-export {DOM}
+export { DOM };

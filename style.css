@@ -1,3 +1,6 @@
+html, body {
+    margin: 0px;
+}
 #main-container {
     display: flex;
     flex-direction: column;
@@ -5,16 +8,30 @@
     align-items: center;
     height: 100vh;
 }
+#winner-screen {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+    background-color: rgb(16, 24, 43);
+    color:honeydew;
+}
 .board {
     display: grid;
-    grid-template-columns: repeat(10, auto);
-    grid-template-rows: repeat(10, auto);
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
     height: 40vh;
     width: 40vh;
     margin: 5vh;
     border: 0.5px solid black;
 }
 .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 0.5px solid black;
     cursor: pointer;
 }
@@ -25,5 +42,6 @@
     background-color: yellow;
 }
 .hit {
-    background-color: red;
+    max-width: 75%;
+    max-height: 75%;
 }
